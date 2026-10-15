@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Storyboard & B-Roll</title>
+    <!-- App Favicon Matching Google Workspace Palette -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%231A73E8'><path d='M448 32H64C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zM160 96l64 96H128L64 96h96zm128 0l64 96H256l-64-96h96zm128 0v32l-64 64h-32l64-96h32zM64 416V224h384v192H64z'/></svg>">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Html2Canvas & JsPDF for Image & PDF Exports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        google: {
+                            blue: '#1A73E8',
+                            blueHover: '#1557B0',
+                            red: '#EA4335',
+                            yellow: '#FBBC04',
+                            green: '#34A853',
+                            darkBase: '#121212',
+                            darkCard: '#1C1D20',
+                            darkBorder: '#2C2D32',
+                            lightBase: '#F8F9FA',
+                            lightCard: '#FFFFFF',
+                            lightBorder: '#DADCE0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --bg-base: #121212;
+            --bg-card: #1C1D20;
+            --border-color: #2C2D32;
+            --text-main: #E8EAED;
+            --text-muted: #9AA0A6;
+            --accent-color: #1A73E8;
+            font-size: 16px;
+        }
+
+        body {
+            font-size: 1rem;
+        }
+
+        /* Interactive Screen Display: Soft Background Highlights with Rounded Corners */
+        .hl-red, .hl-orange, .hl-yellow, .hl-brown, .hl-lightgreen, .hl-green, .hl-cyan, .hl-blue, .hl-purple, .hl-pink, .hl-black, .hl-gray, .hl-aroll {
+            display: inline;
+            padding: 3px 6px;
+            margin: 0 1px;
+            border-radius: 6px;
+            line-height: 1.8;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .hl-red { background-color: rgba(239, 68, 68, 0.25); color: #F87171; }
+        .hl-orange { background-color: rgba(249, 115, 22, 0.25); color: #FB923C; }
+        .hl-yellow { background-color: rgba(234, 179, 8, 0.28); color: #FDE047; }
+        .hl-brown { background-color: rgba(180, 83, 9, 0.28); color: #FDBA74; }
+        .hl-lightgreen { background-color: rgba(132, 204, 22, 0.28); color: #A3E635; }
+        .hl-green { background-color: rgba(34, 197, 94, 0.25); color: #4ADE80; }
+        .hl-cyan { background-color: rgba(6, 182, 212, 0.25); color: #38BDF8; }
+        .hl-blue { background-color: rgba(59, 130, 246, 0.25); color: #60A5FA; }
+        .hl-purple { background-color: rgba(168, 85, 247, 0.25); color: #C084FC; }
+        .hl-pink { background-color: rgba(236, 72, 153, 0.25); color: #F472B6; }
+        .hl-black { background-color: rgba(30, 41, 59, 0.7); color: #F1F5F9; border: 1px solid rgba(148, 163, 184, 0.3); }
+        .hl-gray { background-color: rgba(148, 163, 184, 0.25); color: #E2E8F0; }
+        .hl-aroll { background-color: transparent; color: inherit; font-weight: 400; opacity: 0.9; padding: 0; }
+
+        /* Light Mode High-Contrast Background Highlight Overrides */
+        html:not(.dark) .hl-red { background-color: rgba(220, 38, 38, 0.14); color: #DC2626; }
+        html:not(.dark) .hl-orange { background-color: rgba(234, 88, 12, 0.14); color: #EA580C; }
+        html:not(.dark) .hl-yellow { background-color: rgba(217, 119, 6, 0.18); color: #B45309; }
+        html:not(.dark) .hl-brown { background-color: rgba(180, 83, 9, 0.16); color: #92400E; }
+        html:not(.dark) .hl-lightgreen { background-color: rgba(101, 163, 13, 0.18); color: #4D7C0F; }
+        html:not(.dark) .hl-green { background-color: rgba(22, 163, 74, 0.14); color: #16A34A; }
+        html:not(.dark) .hl-cyan { background-color: rgba(8, 145, 178, 0.14); color: #0891B2; }
+        html:not(.dark) .hl-blue { background-color: rgba(29, 78, 216, 0.14); color: #1D4ED8; }
+        html:not(.dark) .hl-purple { background-color: rgba(126, 34, 206, 0.14); color: #7E22CE; }
+        html:not(.dark) .hl-pink { background-color: rgba(190, 24, 93, 0.14); color: #BE185D; }
+        html:not(.dark) .hl-black { background-color: rgba(15, 23, 42, 0.12); color: #0F172A; border: 1px solid rgba(15, 23, 42, 0.3); }
+        html:not(.dark) .hl-gray { background-color: rgba(71, 85, 105, 0.14); color: #334155; }
+
+        /* EXPORT MODE OVERRIDE */
+        .export-mode .hl-red,
+        .export-mode .hl-orange,
+        .export-mode .hl-yellow,
+        .export-mode .hl-brown,
+        .export-mode .hl-lightgreen,
+        .export-mode .hl-green,
+        .export-mode .hl-cyan,
+        .export-mode .hl-blue,
+        .export-mode .hl-purple,
+        .export-mode .hl-pink,
+        .export-mode .hl-black,
+        .export-mode .hl-gray,
+        .export-mode .hl-aroll {
+            background-color: transparent !important;
+            border: none !important;
+            text-decoration: none !important;
+            box-shadow: none !important;
+            padding: 0 1px !important;
+            margin: 0 !important;
+        }
+
+        .export-mode .border-b,
+        .export-mode button,
+        .export-mode input,
+        .export-mode label,
+        .export-mode select,
+        .export-mode .ui-header-bar,
+        .export-mode .inline-color-picker-popover {
+            display: none !important;
+        }
+
+        .export-mode #highlightedScriptOutput {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 10px !important;
+        }
+
+        /* Block Shot Highlight Styling */
+        .block-red { background-color: rgba(234, 67, 53, 0.12); border-left: 4px solid #EA4335; }
+        .block-orange { background-color: rgba(249, 115, 22, 0.12); border-left: 4px solid #F97316; }
+        .block-yellow { background-color: rgba(251, 188, 4, 0.12); border-left: 4px solid #FBBC04; }
+        .block-brown { background-color: rgba(180, 83, 9, 0.12); border-left: 4px solid #D97706; }
+        .block-lightgreen { background-color: rgba(132, 204, 22, 0.12); border-left: 4px solid #84CC16; }
+        .block-green { background-color: rgba(52, 168, 83, 0.12); border-left: 4px solid #34A853; }
+        .block-cyan { background-color: rgba(6, 182, 212, 0.12); border-left: 4px solid #06B6D4; }
+        .block-blue { background-color: rgba(26, 115, 232, 0.12); border-left: 4px solid #1A73E8; }
+        .block-purple { background-color: rgba(168, 85, 247, 0.12); border-left: 4px solid #A855F7; }
+        .block-pink { background-color: rgba(236, 72, 153, 0.12); border-left: 4px solid #EC4899; }
+        .block-black { background-color: rgba(30, 41, 59, 0.25); border-left: 4px solid #475569; }
+        .block-gray { background-color: rgba(156, 163, 175, 0.12); border-left: 4px solid #9CA3AF; }
+        .block-aroll { background-color: rgba(255, 255, 255, 0.02); border-left: 4px solid #4B5563; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2C2D32; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4D4E54; }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-[#1A73E8] selection:text-white transition-colors duration-300">
+
+    <!-- Header Navigation Bar -->
+    <header class="border-b border-slate-200 dark:border-[#2C2D32] bg-white/95 dark:bg-[#1C1D20]/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-6 lg:px-8 py-2.5 shadow-sm dark:shadow-none">
+        <div class="max-w-[1850px] mx-auto flex flex-col xl:flex-row items-center justify-between gap-3">
+            
+            <!-- Left Section: Logo & Branding -->
+            <div class="flex items-center justify-between w-full xl:w-auto gap-3">
+                <div class="flex items-center space-x-3 shrink-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#1A73E8] flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                        <i class="fa-solid fa-clapperboard text-white text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5 leading-tight">
+                            Studio Storyboard & B-Roll 🎬
+                        </h1>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Auto-Highlight B-Roll & Direct Color Editor ✨</p>
+                    </div>
+                </div>
+
+                <!-- Metrics Overview Banner (Compact Pill on Mobile) -->
+                <div class="flex xl:hidden items-center gap-1.5 bg-slate-100 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded-xl p-1 text-xs">
+                    <div class="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">
+                        B: <strong id="metricBRollMobile">0%</strong>
+                    </div>
+                    <div class="px-2 py-0.5 rounded-lg bg-blue-500/10 text-[#1A73E8] dark:text-blue-400 font-mono text-[11px]">
+                        <i class="fa-solid fa-clock text-[10px]"></i> <strong id="metricDurationMobile">0s</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Section: Metrics Overview (Desktop View) -->
+            <div class="hidden xl:flex items-center gap-2 bg-slate-100 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded-xl p-1 text-xs font-medium">
+                <div class="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-film"></i>
+                    <span>B-Roll: <strong id="metricBRoll">0% (0)</strong></span>
+                </div>
+                <div class="px-3 py-1 rounded-lg bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-user-large"></i>
+                    <span>A-Roll: <strong id="metricARoll">0% (0)</strong></span>
+                </div>
+                <div class="px-3 py-1 rounded-lg bg-blue-500/10 text-[#1A73E8] dark:text-blue-400 font-mono flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Durasi: <strong id="metricDuration">0s</strong></span>
+                </div>
+            </div>
+
+            <!-- Right Section: Categorized Action Controls Group -->
+            <div class="flex items-center justify-between sm:justify-end gap-2 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0 scrollbar-none">
+                
+                <!-- Action Group 1: Project Storage Controls -->
+                <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-[#121212] p-1 rounded-xl border border-slate-200/80 dark:border-[#2C2D32] shrink-0">
+                    <button onclick="exportLocalProject()" class="px-2.5 py-1 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg transition flex items-center gap-1.5" title="Unduh File Proyek (.json)">
+                        <i class="fa-solid fa-download text-[#34A853]"></i>
+                        <span class="hidden sm:inline">Export</span>
+                    </button>
+                    
+                    <button onclick="triggerLocalImport()" class="px-2.5 py-1 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg transition flex items-center gap-1.5" title="Buka File Proyek (.json)">
+                        <i class="fa-solid fa-file-import text-[#FBBC04]"></i>
+                        <span class="hidden sm:inline">Import</span>
+                    </button>
+                    <input type="file" id="localFileInput" accept=".json" onchange="importLocalProject(event)" class="hidden">
+
+                    <button onclick="openHistoryModal()" class="px-2.5 py-1 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg transition flex items-center gap-1.5" title="History Edit">
+                        <i class="fa-solid fa-clock-rotate-left text-[#FBBC04]"></i>
+                        <span class="hidden md:inline">History</span>
+                    </button>
+                </div>
+
+                <!-- Action Group 2: Mode & Teleprompter Controls -->
+                <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-[#121212] p-1 rounded-xl border border-slate-200/80 dark:border-[#2C2D32] shrink-0">
+                    <!-- Light & Dark Mode Switch Segmented Pill -->
+                    <div class="flex items-center p-0.5">
+                        <button id="themeBtnLight" onclick="setThemeMode('light')" class="px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" title="Mode Terang">
+                            <i class="fa-solid fa-sun text-amber-500"></i>
+                        </button>
+                        <button id="themeBtnDark" onclick="setThemeMode('dark')" class="px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 bg-[#1A73E8] text-white shadow" title="Mode Gelap">
+                            <i class="fa-solid fa-moon text-blue-200"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="openTeleprompter()" class="px-2.5 py-1 text-xs font-bold bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-circle-play text-[#FBBC04]"></i> <span>Prompter 📺</span>
+                    </button>
+                </div>
+
+                <!-- Action Group 3: Utility Controls -->
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="loadSampleArticle()" class="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition flex items-center gap-1 shadow-sm" title="Muat Contoh Naskah">
+                        <i class="fa-solid fa-folder-open text-[#1A73E8]"></i> <span class="hidden sm:inline">Contoh</span>
+                    </button>
+                    
+                    <button onclick="resetAll()" class="px-2 py-1 text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-[#EA4335] dark:text-red-400 rounded-xl border border-red-500/20 transition flex items-center gap-1" title="Reset Total">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main class="flex-1 p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 max-w-[1850px] mx-auto w-full">
+
+        <!-- LEFT COLUMN: Compact Filter Rules & Script Input -->
+        <section class="lg:col-span-4 flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto pr-0.5">
+            
+            <!-- Rules Legend Box & Color Selection -->
+            <div class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl p-3.5 shadow-sm dark:shadow-xl">
+                <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-200 dark:border-[#2C2D32]">
+                    <h2 class="text-xs font-bold dark:text-slate-100 text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-palette text-[#1A73E8]"></i>
+                        Palet Warna B-Roll 🌈
+                    </h2>
+                    <span class="text-[10px] font-semibold bg-blue-500/10 text-[#1A73E8] dark:text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono">Real-time ⚡</span>
+                </div>
+
+                <!-- Theme Presets Options -->
+                <div class="mb-2.5 flex flex-col gap-1 bg-slate-50 dark:bg-[#121212] p-2 rounded-xl border border-slate-200 dark:border-[#2C2D32] text-xs">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-slate-700 dark:text-slate-300 font-bold flex items-center gap-1 text-[11px]"><i class="fa-solid fa-bolt text-[#FBBC04]"></i> Preset Vibe:</span>
+                        <button onclick="applyPreset('all')" class="text-[11px] text-[#1A73E8] dark:text-blue-400 hover:underline font-semibold">Reset Warna 🔄</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 w-full">
+                        <button onclick="applyPreset('problem_stakes')" id="preset_problem_stakes" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">🚨 1. Problem</button>
+                        <button onclick="applyPreset('curiosity_gap')" id="preset_curiosity_gap" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">🔍 2. Curiosity</button>
+                        <button onclick="applyPreset('shock_numbers')" id="preset_shock_numbers" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">📊 3. Data GFX</button>
+                        <button onclick="applyPreset('human_story')" id="preset_human_story" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">👤 4. Story</button>
+                        <button onclick="applyPreset('micro_reveal')" id="preset_micro_reveal" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">🔓 5. Reveal</button>
+                        <button onclick="applyPreset('before_after')" id="preset_before_after" class="preset-btn p-1 rounded-lg bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] text-slate-700 dark:text-slate-300 hover:border-[#1A73E8] transition text-left text-[11px] font-medium truncate">🔄 6. Before/After</button>
+                    </div>
+                </div>
+
+                <div class="space-y-1 text-xs max-h-[260px] overflow-y-auto pr-1">
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-red-500/10 border-l-4 border-[#EA4335] cursor-pointer hover:bg-red-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#EA4335] shrink-0"></span>
+                            <span class="truncate"><strong class="text-red-600 dark:text-red-400 font-bold">Merah:</strong> Drama, Conflict & Chaos Vibe 🚨</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_RED" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-orange-500/10 border-l-4 border-orange-500">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-orange-600 dark:text-orange-400 font-bold">Oranye:</strong> Pemberitaan & Eksplanasi 📰</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">Paten 📌</span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-amber-500/10 border-l-4 border-[#FBBC04]">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#FBBC04] shrink-0"></span>
+                            <span class="truncate"><strong class="text-amber-600 dark:text-[#FBBC04] font-bold">Kuning:</strong> Spill Tokoh & Public Figure ⭐</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">Paten 📌</span>
+                    </div>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-amber-700/10 border-l-4 border-amber-700 cursor-pointer hover:bg-amber-700/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-700 shrink-0"></span>
+                            <span class="truncate"><strong class="text-amber-700 dark:text-amber-400 font-bold">Cokelat:</strong> Formasi & Taktik Sepakbola ⚽</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_BROWN" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-lime-500/10 border-l-4 border-lime-500 cursor-pointer hover:bg-lime-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-lime-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-lime-600 dark:text-lime-400 font-bold">Hijau Muda:</strong> Sejarah, Nostalgia & Unik 📜</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_LIGHTGREEN" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-emerald-500/10 border-l-4 border-emerald-500 cursor-pointer hover:bg-emerald-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-emerald-600 dark:text-emerald-400 font-bold">Hijau:</strong> Bisnis, Keuangan & Ekonomi 💸</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_GREEN" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-cyan-500/10 border-l-4 border-cyan-500 cursor-pointer hover:bg-cyan-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-cyan-600 dark:text-cyan-400 font-bold">Cyan:</strong> Info Terhangat & Investigation 🕵️‍♂️</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_CYAN" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-blue-500/10 border-l-4 border-[#1A73E8] cursor-pointer hover:bg-blue-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#1A73E8] shrink-0"></span>
+                            <span class="truncate"><strong class="text-blue-600 dark:text-blue-400 font-bold">Biru:</strong> Visi Masa Depan & Cinematic 🎥</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_BLUE" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-purple-500/10 border-l-4 border-purple-500 cursor-pointer hover:bg-purple-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-purple-600 dark:text-purple-400 font-bold">Ungu:</strong> Direct Quote & Statement 💬</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_PURPLE" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-pink-500/10 border-l-4 border-pink-500 cursor-pointer hover:bg-pink-500/20 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-pink-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-pink-600 dark:text-pink-400 font-bold">Pink:</strong> Bentrokan & Drama Netizen 🔥</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_PINK" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <label class="flex items-center justify-between p-1.5 rounded-lg bg-slate-700/20 border-l-4 border-slate-700 cursor-pointer hover:bg-slate-700/30 transition">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-700 shrink-0"></span>
+                            <span class="truncate"><strong class="text-slate-800 dark:text-slate-200 font-bold">Hitam:</strong> Opini, Hipotesis & Netizen 🧠</span>
+                        </div>
+                        <input type="checkbox" id="chk_color_BLACK" onchange="handleColorCheckboxChange(this)" class="w-3.5 h-3.5 accent-[#1A73E8] cursor-pointer rounded">
+                    </label>
+
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-slate-500/10 border-l-4 border-slate-400">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0"></span>
+                            <span class="truncate"><strong class="text-slate-700 dark:text-slate-300 font-bold">Abu-abu:</strong> GFX Nama, Data & Media 📊</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">Paten 📌</span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 border-l-4 border-slate-500">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0"></span>
+                            <span class="truncate"><strong class="text-slate-800 dark:text-slate-200 font-bold">A-Roll (~30%):</strong> Presenter Talking Head 🗣️</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-1.5 py-0.5 rounded shrink-0">Paten 📌</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form Box -->
+            <div class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl p-3.5 shadow-sm dark:shadow-xl flex-1 flex flex-col space-y-2">
+                <div>
+                    <label for="articleTitleInput" class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Judul Naskah 📝:</label>
+                    <input type="text" id="articleTitleInput" oninput="updateDisplayTitle()" placeholder="Ketik judul naskah lu..." class="w-full bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#1A73E8]">
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label for="articleInput" class="text-xs font-bold dark:text-slate-100 text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-lines text-[#1A73E8]"></i> Script / Naskah
+                    </label>
+                    <span class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md" id="wordCountLabel">0 Kata</span>
+                </div>
+                
+                <textarea id="articleInput" oninput="updateWordCount()" class="w-full flex-1 min-h-[160px] bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded-xl p-3 text-xs dark:text-slate-200 text-slate-800 focus:outline-none focus:border-[#1A73E8] transition font-mono resize-y leading-relaxed shadow-inner" placeholder="[Paste naskah/script lu di sini, langsung di-highlight auto sat-set...]"></textarea>
+                
+                <button onclick="processArticle()" class="w-full py-2.5 px-3 bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> Gaskeun Highlight & Breakdown! 🔥
+                </button>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Output Storyboard & Tabs -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+
+            <!-- Control Bar & Export Header -->
+            <div class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2.5 shadow-sm dark:shadow-xl">
+                <!-- Navigation Tabs -->
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-[#121212] p-1 rounded-xl border border-slate-200 dark:border-[#2C2D32]">
+                    <button id="tabBtn1" onclick="switchTab('highlightedText')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#1A73E8] text-white transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-highlighter"></i> Script Ber-Highlight 🎨
+                    </button>
+                    <button id="tabBtn3" onclick="switchTab('assetSummary')" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check"></i> Spill Aset B-Roll 📦
+                    </button>
+                </div>
+
+                <!-- Export Options / Download Buttons -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <button onclick="copyFormattedScript()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg shadow-sm transition flex items-center gap-1.5" title="Salin naskah ke clipboard">
+                        <i class="fa-solid fa-copy text-[#1A73E8]"></i> Copy 📋
+                    </button>
+                    <button onclick="exportToPDF()" class="px-2.5 py-1.5 text-xs font-bold bg-[#34A853] hover:bg-emerald-600 text-white rounded-lg shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf"></i> PDF 📄
+                    </button>
+                    <button onclick="exportToImage('jpg')" class="px-2.5 py-1.5 text-xs font-bold bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-lg shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-image"></i> JPG 🖼️
+                    </button>
+                </div>
+            </div>
+
+            <div id="storyboardExportContainer" class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-2xl flex-1 min-h-[480px]">
+                
+                <!-- TAB 1: Highlighted Article View -->
+                <div id="tabHighlightedText" class="space-y-3.5">
+                    <div class="border-b border-slate-200 dark:border-[#2C2D32] pb-3 flex flex-wrap items-center justify-between gap-2.5 ui-header-bar">
+                        <div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">✨ Blok kata/kalimat mana aja pakai mouse buat ganti warna kustom! ⚡</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium cursor-pointer bg-slate-50 dark:bg-[#121212] px-2 py-1 rounded-lg border border-slate-200 dark:border-[#2C2D32]" title="Tampilkan catatan visual langsung di sela-sela paragraf">
+                                <input type="checkbox" id="showInlineVisuals" onchange="renderHighlightedOutput()" class="accent-[#1A73E8] rounded">
+                                <span>Tampil Catatan Visual Inline 👁️</span>
+                            </label>
+                            <div class="flex items-center gap-1 bg-slate-50 dark:bg-[#121212] p-1 rounded-lg border border-slate-200 dark:border-[#2C2D32] text-xs">
+                                <button id="viewProseBtn" onclick="toggleArticleFormat('prose')" class="px-2 py-0.5 rounded bg-[#1A73E8] text-white font-bold transition">
+                                    Paragraf Docs
+                                </button>
+                                <button id="viewBlocksBtn" onclick="toggleArticleFormat('blocks')" class="px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition">
+                                    Block Shot
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Article Title Display Banner -->
+                    <div class="bg-slate-100 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded-xl p-3 text-center shadow-inner">
+                        <span class="text-[10px] uppercase font-mono font-bold tracking-wider text-[#1A73E8] dark:text-blue-400 block mb-0.5">Judul Naskah:</span>
+                        <h2 id="displayArticleTitle" class="text-sm sm:text-base font-extrabold dark:text-white text-slate-900 leading-snug">
+                            [ Belum Ada Judul Naskah ]
+                        </h2>
+                    </div>
+
+                    <!-- Dynamic Render Container for Highlighted Prose/Blocks -->
+                    <div id="highlightedScriptOutput" onmouseup="handleCustomTextSelection(event)" class="p-4 bg-slate-50 dark:bg-[#121212]/80 border border-slate-200 dark:border-[#2C2D32] rounded-xl min-h-[360px] relative select-text">
+                        <div class="text-center py-14 text-slate-500 flex flex-col items-center gap-3">
+                            <i class="fa-solid fa-wand-magic-sparkles text-4xl text-[#1A73E8]/40 animate-pulse"></i>
+                            <p class="text-xs font-medium">Belum ada script nih! Paste naskah lu di panel kiri terus klik <strong>"Gaskeun Highlight & Breakdown!"</strong> ✨</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Asset Summary Checklist -->
+                <div id="tabAssetSummary" class="hidden space-y-3.5">
+                    <div class="border-b border-slate-200 dark:border-[#2C2D32] pb-3 flex flex-wrap justify-between items-center gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold dark:text-white text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-boxes-packing text-[#1A73E8]"></i> List Aset B-Roll & Motion Graphics 📦
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Atur limit klip Kuning & Abu-abu di bawah. Pengurangan klip bakal otomatis dilimpahkan ke warna B-Roll lain! ⚡</p>
+                        </div>
+                        <button onclick="resetCustomLimits()" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg border border-slate-200 dark:border-slate-700 transition flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-left text-amber-500"></i> Reset Limit Otomatis
+                        </button>
+                    </div>
+
+                    <div id="assetSummaryOutput" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        <div class="p-6 text-center text-slate-500 text-xs col-span-2">Belum ada rangkuman aset. Klik "Gaskeun Highlight & Breakdown!" dulu ya. 💡</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Quick Inline Color Picker Popover -->
+    <div id="inlineColorPickerPopover" class="fixed z-50 hidden bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl p-3 shadow-2xl space-y-2 max-w-xs font-sans text-xs">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-[#2C2D32] pb-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+            <span id="popoverHeaderTitle">Ubah Warna Highlight:</span>
+            <button onclick="closeInlineColorPicker()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto pr-1" id="popoverColorButtons">
+            <!-- Dynamic color buttons populated via JS -->
+        </div>
+    </div>
+
+    <!-- Teleprompter Interactive Modal Overlay -->
+    <div id="teleprompterModal" class="fixed inset-0 z-50 bg-[#121212]/95 backdrop-blur-md hidden flex flex-col justify-between p-4 sm:p-8 lg:p-10 text-white">
+        <div class="flex items-center justify-between border-b border-[#2C2D32] pb-3">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-circle-play text-[#FBBC04] text-xl"></i>
+                <div>
+                    <h2 class="text-xs sm:text-sm font-bold">Teleprompter Mode 📺</h2>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Prompter bacain script dengan highlight B-Roll real-time</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 bg-[#1C1D20] border border-[#2C2D32] px-2.5 py-1 rounded-xl text-xs font-mono">
+                    <span class="text-slate-400 text-[11px]">Speed:</span>
+                    <input type="range" id="teleprompterSpeed" min="1" max="10" value="3" class="w-16 sm:w-20 accent-[#1A73E8] cursor-pointer">
+                </div>
+                <button id="telePlayBtn" onclick="toggleTeleprompterPlay()" class="px-3 py-1 bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-play"></i> Mulai ▶️
+                </button>
+                <button onclick="closeTeleprompter()" class="p-1.5 text-slate-400 hover:text-white transition rounded-xl bg-[#1C1D20] border border-[#2C2D32]">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="teleprompterTextContainer" class="flex-1 overflow-y-auto my-4 px-2 sm:px-8 text-lg sm:text-2xl lg:text-3xl leading-relaxed font-sans text-left max-w-4xl mx-auto w-full space-y-4 scroll-smooth">
+        </div>
+
+        <div class="text-center text-xs text-slate-500 border-t border-[#2C2D32] pt-2">
+            Tekan ESC atau tombol silang untuk keluar.
+        </div>
+    </div>
+
+    <!-- Edit History & Restore Modal Overlay -->
+    <div id="historyModal" class="fixed inset-0 z-50 bg-[#121212]/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-2xl w-full max-w-xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-3.5 border-b border-slate-200 dark:border-[#2C2D32] flex items-center justify-between bg-slate-50 dark:bg-[#121212]">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold dark:text-white text-slate-900">Log History Edit ⏳</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Restore draft script ke versi sebelumnya.</p>
+                    </div>
+                </div>
+                <button onclick="closeHistoryModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            
+            <div id="historyListContainer" class="p-3.5 flex-1 overflow-y-auto space-y-2 font-sans">
+                <div class="text-center py-8 text-slate-500 text-xs">Belum ada history edit tersimpan.</div>
+            </div>
+
+            <div class="p-3 border-t border-slate-200 dark:border-[#2C2D32] bg-slate-50 dark:bg-[#121212] flex items-center justify-between text-xs text-slate-500">
+                <span id="historyCountText">0 Versi Tersimpan</span>
+                <button onclick="clearHistoryLogs()" class="text-[#EA4335] hover:underline flex items-center gap-1 font-medium">
+                    <i class="fa-solid fa-trash-can"></i> Hapus History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Message Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-[#1C1D20] text-white px-3.5 py-2 rounded-xl border border-[#2C2D32] shadow-2xl flex items-center gap-2">
+        <i id="toastIcon" class="fa-solid fa-circle-info text-[#1A73E8] text-sm"></i>
+        <span id="toastMsg" class="text-xs font-medium">Notifikasi</span>
+    </div>
+
+    <script>
+        // --- GLOBAL HELPER FUNCTIONS BOUND EARLY TO WINDOW TO PREVENT REFERENCE ERRORS ---
+        window.showToast = function(msg, iconClass = "fa-circle-info", iconColorClass = "text-[#1A73E8]") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.textContent = msg;
+            toastIcon.className = `fa-solid ${iconClass} ${iconColorClass} text-sm`;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3200);
+        };
+
+        window.escapeHtml = function(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+
+        window.updateDisplayTitle = function() {
+            const titleInput = document.getElementById('articleTitleInput');
+            const displayTitle = document.getElementById('displayArticleTitle');
+            if (displayTitle) {
+                const val = titleInput ? titleInput.value.trim() : '';
+                displayTitle.textContent = val ? val : '[ Belum Ada Judul Naskah ]';
+            }
+        };
+
+        window.switchTab = function(tabName) {
+            const tabHighlightedText = document.getElementById('tabHighlightedText');
+            const tabAssetSummary = document.getElementById('tabAssetSummary');
+            
+            const tabBtn1 = document.getElementById('tabBtn1');
+            const tabBtn3 = document.getElementById('tabBtn3');
+
+            const activeClass = "px-3 py-1.5 text-xs font-bold rounded-lg bg-[#1A73E8] text-white transition flex items-center gap-1.5 shadow";
+            const inactiveClass = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition flex items-center gap-1.5";
+
+            if (tabName === 'highlightedText') {
+                tabHighlightedText?.classList.remove('hidden');
+                tabAssetSummary?.classList.add('hidden');
+
+                if (tabBtn1) tabBtn1.className = activeClass;
+                if (tabBtn3) tabBtn3.className = inactiveClass;
+            } else if (tabName === 'assetSummary') {
+                tabHighlightedText?.classList.add('hidden');
+                tabAssetSummary?.classList.remove('hidden');
+
+                if (tabBtn1) tabBtn1.className = inactiveClass;
+                if (tabBtn3) tabBtn3.className = activeClass;
+                renderAssetSummary();
+            }
+        };
+
+        window.setThemeMode = function(mode) {
+            const html = document.documentElement;
+            const btnLight = document.getElementById('themeBtnLight');
+            const btnDark = document.getElementById('themeBtnDark');
+
+            if (mode === 'dark') {
+                html.classList.add('dark');
+                if (btnDark) btnDark.className = "px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 bg-[#1A73E8] text-white shadow";
+                if (btnLight) btnLight.className = "px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100";
+            } else {
+                html.classList.remove('dark');
+                if (btnLight) btnLight.className = "px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 bg-[#1A73E8] text-white shadow";
+                if (btnDark) btnDark.className = "px-2 py-0.5 text-xs font-bold rounded-lg transition flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100";
+            }
+            try { localStorage.setItem('studio_theme_mode', mode); } catch(e){}
+        };
+
+        window.toggleTheme = function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setThemeMode(isDark ? 'light' : 'dark');
+        };
+
+        window.handleColorCheckboxChange = function(el) {
+            if (!el) return;
+            const checkedCount = OPTIONAL_COLOR_KEYS.filter(k => {
+                const item = document.getElementById(`chk_color_${k}`);
+                return item && item.checked;
+            }).length;
+
+            if (checkedCount > 2) {
+                el.checked = false;
+                showToast("Maksimal hanya 2 warna opsional yang bisa dicentang! 🛑", "fa-triangle-exclamation", "text-amber-400");
+                return;
+            }
+            processArticle();
+        };
+
+        window.pushHistoryState = function(actionTitle) {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            const rawText = document.getElementById('articleInput')?.value || '';
+
+            historyLogs.unshift({
+                timestamp: timeStr,
+                actionTitle: actionTitle,
+                shotCount: parsedSentences.length,
+                parsedSentences: JSON.parse(JSON.stringify(parsedSentences)),
+                rawText: rawText
+            });
+
+            if (historyLogs.length > 20) historyLogs.pop();
+        };
+
+        window.resetAll = function() {
+            document.getElementById('articleInput').value = '';
+            document.getElementById('articleTitleInput').value = '';
+            parsedSentences = [];
+            historyLogs = [];
+            customYellowCap = null;
+            customGrayCap = null;
+            OPTIONAL_COLOR_KEYS.forEach(k => {
+                const el = document.getElementById(`chk_color_${k}`);
+                if (el) el.checked = false;
+            });
+            updateWordCount();
+            updateDisplayTitle();
+            renderAllViews();
+            showToast("Semua data berhasil di-reset total! 🧹", "fa-rotate-right", "text-emerald-400");
+        };
+
+        window.resetCustomLimits = function() {
+            customYellowCap = null;
+            customGrayCap = null;
+            processArticle();
+            showToast("Limit klip dikembalikan ke perhitungan otomatis! 🔄", "fa-rotate-left", "text-emerald-400");
+        };
+
+        // --- CONSTANTS & STATE VARIABLES ---
+        const CATEGORIES = {
+            A_ROLL: { id: 'A_ROLL', name: 'A-Roll Talking Head', code: 'A-ROLL', colorClass: 'hl-aroll', blockClass: 'block-aroll', badgeBg: 'bg-slate-500 text-white' },
+            RED: { id: 'RED', name: 'Drama, Conflict & Chaos', code: 'MERAH', colorClass: 'hl-red', blockClass: 'block-red', badgeBg: 'bg-red-500 text-white' },
+            ORANGE: { id: 'ORANGE', name: 'Pemberitaan & Eksplanasi', code: 'ORANYE', colorClass: 'hl-orange', blockClass: 'block-orange', badgeBg: 'bg-orange-500 text-white' },
+            YELLOW: { id: 'YELLOW', name: 'Spill Tokoh & Public Figure', code: 'KUNING', colorClass: 'hl-yellow', blockClass: 'block-yellow', badgeBg: 'bg-amber-400 text-slate-900' },
+            BROWN: { id: 'BROWN', name: 'Formasi & Taktik Sepakbola', code: 'COKELAT', colorClass: 'hl-brown', blockClass: 'block-brown', badgeBg: 'bg-amber-700 text-white' },
+            LIGHTGREEN: { id: 'LIGHTGREEN', name: 'Sejarah, Nostalgia & Unik', code: 'HIJAU MUDA', colorClass: 'hl-lightgreen', blockClass: 'block-lightgreen', badgeBg: 'bg-lime-500 text-slate-900' },
+            GREEN: { id: 'GREEN', name: 'Bisnis, Keuangan & Ekonomi', code: 'HIJAU', colorClass: 'hl-green', blockClass: 'block-green', badgeBg: 'bg-emerald-500 text-white' },
+            CYAN: { id: 'CYAN', name: 'Info Terhangat & Investigation', code: 'CYAN', colorClass: 'hl-cyan', blockClass: 'block-cyan', badgeBg: 'bg-cyan-500 text-slate-900' },
+            BLUE: { id: 'BLUE', name: 'Visi Masa Depan & Cinematic', code: 'BIRU', colorClass: 'hl-blue', blockClass: 'block-blue', badgeBg: 'bg-[#1A73E8] text-white' },
+            PURPLE: { id: 'PURPLE', name: 'Direct Quote & Statement', code: 'UNGU', colorClass: 'hl-purple', blockClass: 'block-purple', badgeBg: 'bg-purple-500 text-white' },
+            PINK: { id: 'PINK', name: 'Bentrokan & Drama Netizen', code: 'PINK', colorClass: 'hl-pink', blockClass: 'block-pink', badgeBg: 'bg-pink-500 text-white' },
+            BLACK: { id: 'BLACK', name: 'Opini, Hipotesis & Netizen', code: 'HITAM', colorClass: 'hl-black', blockClass: 'block-black', badgeBg: 'bg-slate-800 text-white' },
+            GRAY: { id: 'GRAY', name: 'GFX Nama, Data & Media', code: 'ABU-ABU', colorClass: 'hl-gray', blockClass: 'block-gray', badgeBg: 'bg-slate-400 text-slate-900' }
+        };
+
+        const OPTIONAL_COLOR_KEYS = ['RED', 'BROWN', 'LIGHTGREEN', 'GREEN', 'CYAN', 'BLUE', 'PURPLE', 'PINK', 'BLACK'];
+
+        let parsedSentences = [];
+        let historyLogs = [];
+        let articleFormat = 'prose';
+        let teleprompterInterval = null;
+        let activeInlineShotIdx = null;
+        let customYellowCap = null;
+        let customGrayCap = null;
+        let customSelectionRange = null;
+
+        function handleCustomTextSelection(event) {
+            const selection = window.getSelection();
+            if (!selection || selection.isCollapsed) return;
+
+            const selectedText = selection.toString().trim();
+            if (selectedText.length < 2) return;
+
+            const container = document.getElementById('highlightedScriptOutput');
+            if (!container || !container.contains(selection.anchorNode)) return;
+
+            customSelectionRange = {
+                text: selectedText,
+                range: selection.getRangeAt(0).cloneRange()
+            };
+
+            openCustomSelectionColorPicker(event, selectedText);
+        }
+
+        function openCustomSelectionColorPicker(event, textSnippet) {
+            const popover = document.getElementById('inlineColorPickerPopover');
+            const popoverHeaderTitle = document.getElementById('popoverHeaderTitle');
+            const popoverColorButtons = document.getElementById('popoverColorButtons');
+
+            if (!popover || !popoverHeaderTitle || !popoverColorButtons) return;
+
+            const shortTitle = textSnippet.length > 20 ? textSnippet.substring(0, 20) + '...' : textSnippet;
+            popoverHeaderTitle.textContent = `Highlight: "${shortTitle}"`;
+
+            let btnsHtml = '';
+            Object.keys(CATEGORIES).forEach(catKey => {
+                const cat = CATEGORIES[catKey];
+                btnsHtml += `
+                    <button onclick="applyCustomSelectionColor('${catKey}')" class="p-1.5 rounded-lg border text-[11px] font-bold text-left truncate flex items-center gap-1 transition border-slate-200 dark:border-[#2C2D32] hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <span class="w-2 h-2 rounded-full shrink-0 ${cat.badgeBg}"></span>
+                        <span class="truncate dark:text-slate-200 text-slate-800">${cat.code}</span>
+                    </button>
+                `;
+            });
+
+            popoverColorButtons.innerHTML = btnsHtml;
+
+            const pageX = event.pageX || (event.clientX + window.scrollX);
+            const pageY = event.pageY || (event.clientY + window.scrollY);
+
+            popover.style.top = `${pageY + 10}px`;
+            popover.style.left = `${Math.min(pageX, window.innerWidth - 300)}px`;
+            popover.classList.remove('hidden');
+        }
+
+        function applyCustomSelectionColor(catKey) {
+            if (!customSelectionRange) return;
+
+            const selectedText = customSelectionRange.text;
+            const category = CATEGORIES[catKey];
+            if (!category) return;
+
+            const targetIndex = parsedSentences.findIndex(s => s.text.includes(selectedText));
+
+            if (targetIndex !== -1) {
+                const sentence = parsedSentences[targetIndex];
+                if (sentence.text.trim() === selectedText) {
+                    sentence.category = category;
+                    sentence.visualPrompt = generateVisualConcept(category.id, sentence.text);
+                    sentence.isRevised = true;
+                } else {
+                    const parts = sentence.text.split(selectedText);
+                    const beforeText = parts[0];
+                    const afterText = parts.slice(1).join(selectedText);
+
+                    const newSentences = [];
+                    if (beforeText.trim()) {
+                        newSentences.push({
+                            id: sentence.id,
+                            text: beforeText.trim(),
+                            paragraphIndex: sentence.paragraphIndex,
+                            category: sentence.category,
+                            visualPrompt: sentence.visualPrompt,
+                            revisionNote: sentence.revisionNote,
+                            isRevised: sentence.isRevised
+                        });
+                    }
+
+                    newSentences.push({
+                        id: sentence.id + 0.1,
+                        text: selectedText,
+                        paragraphIndex: sentence.paragraphIndex,
+                        category: category,
+                        visualPrompt: generateVisualConcept(category.id, selectedText),
+                        revisionNote: 'Kustom Highlight',
+                        isRevised: true
+                    });
+
+                    if (afterText.trim()) {
+                        newSentences.push({
+                            id: sentence.id + 0.2,
+                            text: afterText.trim(),
+                            paragraphIndex: sentence.paragraphIndex,
+                            category: sentence.category,
+                            visualPrompt: sentence.visualPrompt,
+                            revisionNote: sentence.revisionNote,
+                            isRevised: sentence.isRevised
+                        });
+                    }
+
+                    parsedSentences.splice(targetIndex, 1, ...newSentences);
+                }
+            }
+
+            closeInlineColorPicker();
+            window.getSelection()?.removeAllRanges();
+            customSelectionRange = null;
+
+            pushHistoryState(`Highlight Kustom: ${category.code}`);
+            renderAllViews();
+            showToast(`Text terpilih berhasil di-highlight dengan warna ${category.code}! 🎨`, "fa-paint-roller", "text-emerald-400");
+        }
+
+        function openInlineColorPicker(event, index) {
+            event.stopPropagation();
+            activeInlineShotIdx = index;
+            const popover = document.getElementById('inlineColorPickerPopover');
+            const popoverHeaderTitle = document.getElementById('popoverHeaderTitle');
+            const popoverColorButtons = document.getElementById('popoverColorButtons');
+            
+            if (!popover || !popoverHeaderTitle || !popoverColorButtons) return;
+
+            const shot = parsedSentences[index];
+            if (!shot) return;
+
+            popoverHeaderTitle.textContent = `Ubah Warna Shot #${shot.id}`;
+
+            let btnsHtml = '';
+            Object.keys(CATEGORIES).forEach(catKey => {
+                const cat = CATEGORIES[catKey];
+                const isActive = cat.id === shot.category.id;
+                btnsHtml += `
+                    <button onclick="applyInlineColorChoice('${catKey}')" class="p-1.5 rounded-lg border text-[11px] font-bold text-left truncate flex items-center gap-1 transition ${isActive ? 'border-[#1A73E8] bg-blue-500/10' : 'border-slate-200 dark:border-[#2C2D32] hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                        <span class="w-2 h-2 rounded-full shrink-0 ${cat.badgeBg}"></span>
+                        <span class="truncate dark:text-slate-200 text-slate-800">${cat.code}</span>
+                    </button>
+                `;
+            });
+
+            popoverColorButtons.innerHTML = btnsHtml;
+
+            const rect = event.currentTarget.getBoundingClientRect();
+            popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            popover.style.left = `${Math.min(rect.left + window.scrollX, window.innerWidth - 300)}px`;
+            popover.classList.remove('hidden');
+        }
+
+        function applyInlineColorChoice(catKey) {
+            if (activeInlineShotIdx !== null && parsedSentences[activeInlineShotIdx]) {
+                updateSentenceCategory(activeInlineShotIdx, catKey);
+                parsedSentences[activeInlineShotIdx].isRevised = true;
+                closeInlineColorPicker();
+                showToast(`Warna Shot #${parsedSentences[activeInlineShotIdx].id} berhasil diubah ke ${CATEGORIES[catKey].code}!`, "fa-paint-roller", "text-emerald-400");
+            }
+        }
+
+        function closeInlineColorPicker() {
+            document.getElementById('inlineColorPickerPopover')?.classList.add('hidden');
+            activeInlineShotIdx = null;
+            customSelectionRange = null;
+        }
+
+        function setCategoryLimit(catKey, deltaOrValue) {
+            const wordCount = (document.getElementById('articleInput')?.value || '').trim().split(/\s+/).filter(Boolean).length;
+            
+            let defaultYellow = 10;
+            if (wordCount <= 650) {
+                defaultYellow = 6;
+            } else if (wordCount < 1000) {
+                defaultYellow = Math.round(6 + ((wordCount - 650) / 350) * 4);
+            }
+
+            let currentYellow = customYellowCap !== null ? customYellowCap : defaultYellow;
+
+            if (catKey === 'YELLOW') {
+                let newVal = typeof deltaOrValue === 'number' && deltaOrValue < 10 && deltaOrValue > -10 ? currentYellow + deltaOrValue : deltaOrValue;
+                if (newVal < 0) newVal = 0;
+                customYellowCap = newVal;
+                showToast(`Limit Klip Kuning diubah ke: ${newVal} klip! Sisa klip dialihkan ke B-Roll lain. ⚡`, "fa-sliders", "text-amber-400");
+            } else if (catKey === 'GRAY') {
+                const existingGrayCount = parsedSentences.filter(s => s.category.id === 'GRAY').length;
+                let currentVal = customGrayCap !== null ? customGrayCap : existingGrayCount;
+                let newVal = typeof deltaOrValue === 'number' && deltaOrValue < 10 && deltaOrValue > -10 ? currentVal + deltaOrValue : deltaOrValue;
+                if (newVal < 0) newVal = 0;
+                customGrayCap = newVal;
+                showToast(`Limit Klip Abu-abu (GFX) diubah ke: ${newVal} klip! Sisa klip dialihkan ke B-Roll lain. ⚡`, "fa-sliders", "text-amber-400");
+            }
+
+            processArticle();
+        }
+
+        function generateVisualConcept(catId, text) {
+            if (!text) return 'Stock Footage B-Roll Pendukung';
+            const cleanText = text.trim();
+            const shortText = cleanText.length > 30 ? cleanText.substring(0, 30) + '...' : cleanText;
+            
+            switch (catId) {
+                case 'A_ROLL': return 'Kamera Utama / Presenter Talking Head (A-Roll)';
+                case 'RED': return 'Footage Berita Suasana Tegang / Konflik / Drama / Kegoyahan';
+                case 'ORANGE': return 'Klip Berita Eksplanasi / Liputan Lapangan / Media Headlines';
+                case 'YELLOW': return `Lower-Third Nama Tokoh & Foto Resmi Sosok (${shortText})`;
+                case 'BROWN': return 'Formasi Lapangan, Skema Taktik 3D / Diagram Analisis Bola';
+                case 'LIGHTGREEN': return 'Arsip Sejarah / Footage Nostalgia B&W / Kilas Balik Masa Lalu';
+                case 'GREEN': return 'GFX Keuangan, Grafik Saham, Pertumbuhan Ekonomi & Bisnis';
+                case 'CYAN': return 'B-Roll Investigasi / Update Terkini / Footage Komputer & Dokumen';
+                case 'BLUE': return 'Footage Cinematic Slow-Motion / Visi Masa Depan / Concept Shot';
+                case 'PURPLE': return 'Grafis Kutipan Quotes Direct / Text-on-Screen & Soundbite Tokoh';
+                case 'PINK': return 'Footage Bentrokan / Unjuk Rasa / Perpecahan Massa / Netizen Drama';
+                case 'BLACK': return 'Grafis Bubble Komentar Netizen / Visual Opini & Persepsi Publik';
+                case 'GRAY': return 'Motion Graphics (GFX) Data / Infografis Angka & Diagram Animated';
+                default: return 'Footage B-Roll Pendukung Narasi';
+            }
+        }
+
+        function updateWordCount() {
+            const rawText = document.getElementById('articleInput')?.value || '';
+            const words = rawText.trim() ? rawText.trim().split(/\s+/).filter(Boolean).length : 0;
+            const label = document.getElementById('wordCountLabel');
+            if (label) label.textContent = `${words} Kata`;
+        }
+
+        function processArticle() {
+            const rawText = document.getElementById('articleInput')?.value || '';
+            if (!rawText.trim()) {
+                showToast("Paste naskah/script lu dulu ya biar bisa di-highlight! 📝", "fa-triangle-exclamation", "text-amber-400");
+                parsedSentences = [];
+                renderAllViews();
+                return;
+            }
+
+            updateDisplayTitle();
+
+            const wordCount = rawText.trim().split(/\s+/).filter(Boolean).length;
+            
+            let maxYellowCap = 10;
+            if (wordCount <= 650) {
+                maxYellowCap = 6;
+            } else if (wordCount < 1000) {
+                maxYellowCap = Math.round(6 + ((wordCount - 650) / 350) * 4);
+            }
+
+            if (customYellowCap !== null) {
+                maxYellowCap = customYellowCap;
+            }
+
+            let maxGrayCap = customGrayCap !== null ? customGrayCap : Infinity;
+
+            const paragraphs = rawText.split(/\n+/).filter(p => p.trim().length > 0);
+            let sentenceList = [];
+            let globalId = 1;
+
+            paragraphs.forEach((pText, pIndex) => {
+                const rawChunks = pText.match(/[^.!?,]+[.!?,]+|[^.!?,]+$/g) || [pText];
+                
+                rawChunks.forEach(chunk => {
+                    const trimmedChunk = chunk.trim();
+                    if (!trimmedChunk) return;
+
+                    const wordsInChunk = trimmedChunk.split(/\s+/).filter(Boolean);
+
+                    if (wordsInChunk.length <= 2 && sentenceList.length > 0 && sentenceList[sentenceList.length - 1].paragraphIndex === pIndex) {
+                        sentenceList[sentenceList.length - 1].text += ' ' + trimmedChunk;
+                    } else {
+                        sentenceList.push({
+                            id: globalId++,
+                            text: trimmedChunk,
+                            paragraphIndex: pIndex
+                        });
+                    }
+                });
+            });
+
+            const totalCount = sentenceList.length;
+            const targetARollCount = Math.max(1, Math.round(totalCount * 0.3));
+
+            const activeOptionalColors = [];
+            OPTIONAL_COLOR_KEYS.forEach(key => {
+                const el = document.getElementById(`chk_color_${key}`);
+                if (el && el.checked) activeOptionalColors.push(key);
+            });
+
+            const activeBRollPool = ['ORANGE', 'YELLOW', 'GRAY', ...activeOptionalColors];
+            const colorCounts = {};
+            activeBRollPool.forEach(k => colorCounts[k] = 0);
+
+            let assignedARoll = 0;
+
+            const yellowKeywords = ['jokowi', 'prabowo', 'gibran', 'anies', 'ganjar', 'bapak', 'ibu', 'mr', 'mrs', 'dr', 'prof', 'puan', 'luhut', 'sri mulyani', 'yamal', 'lisandro', 'martinez'];
+            const greenKeywords = ['saham', 'investasi', 'ekonomi', 'bisnis', 'uang', 'rupiah', 'dolar', 'omzet', 'pendapatan', 'modal', 'keuangan', 'gaji', 'pasar', 'profit', 'rugi'];
+            const lightGreenKeywords = ['sejarah', 'dulu', 'tahun 19', 'tahun 200', 'masa lalu', 'kenangan', 'asal-usul', 'rekam jejak', 'zaman', 'kisah unik', 'nostalgia'];
+            const blackKeywords = ['menurut netizen', 'kata orang', 'pikiran', 'opini', 'komentar', 'banyak yang mengira', 'netizen', 'persepsi', 'dianggap', 'spekulasi'];
+            const grayKeywords = ['persen', '%', 'juta', 'miliar', 'triliun', 'data', 'grafik', 'angka', 'sumber', 'situs', 'media', 'tv', 'detik', 'kompas', 'cnn', 'caps'];
+            const brownKeywords = ['formasi', 'taktik', 'pelatih', 'bek', 'striker', 'gelandang', 'skema', '4-3-3', '4-4-2', '3-5-2', 'strategi', 'press', 'offside', 'posisi'];
+
+            const transitionStarters = ['meski begitu', 'namun demikian', 'selain itu', 'di sisi lain', 'oleh karena itu', 'walaupun begitu', 'meskipun demikian', 'tak hanya itu', 'alhasil', 'dengan kata lain', 'begitupun'];
+
+            const yellowCandidates = [];
+            if (maxYellowCap > 0) {
+                sentenceList.forEach((item, idx) => {
+                    if (idx % 3 !== 0) {
+                        const textLower = item.text.toLowerCase();
+                        if (yellowKeywords.some(kw => textLower.includes(kw))) {
+                            yellowCandidates.push(idx);
+                        }
+                    }
+                });
+            }
+
+            const selectedYellowIndices = new Set();
+            if (yellowCandidates.length > 0 && maxYellowCap > 0) {
+                const countToPick = Math.min(maxYellowCap, yellowCandidates.length);
+                const step = yellowCandidates.length / countToPick;
+                for (let i = 0; i < countToPick; i++) {
+                    const pickedIndex = yellowCandidates[Math.floor(i * step)];
+                    selectedYellowIndices.add(pickedIndex);
+                }
+            }
+
+            let lastAssignedCategoryKey = null;
+
+            parsedSentences = sentenceList.map((item, idx) => {
+                let textLower = item.text.toLowerCase();
+
+                if ((idx % 3 === 0) && assignedARoll < targetARollCount) {
+                    assignedARoll++;
+                    lastAssignedCategoryKey = 'A_ROLL';
+                    return { ...item, category: CATEGORIES.A_ROLL, visualPrompt: 'Kamera Utama / Presenter (A-Roll)', revisionNote: '', isRevised: false };
+                }
+
+                let selectedCatKey = null;
+
+                if (selectedYellowIndices.has(idx) && (colorCounts['YELLOW'] || 0) < maxYellowCap) {
+                    selectedCatKey = 'YELLOW';
+                } else if (activeOptionalColors.includes('BROWN') && brownKeywords.some(kw => textLower.includes(kw))) {
+                    selectedCatKey = 'BROWN';
+                } else if (activeOptionalColors.includes('GREEN') && greenKeywords.some(kw => textLower.includes(kw))) {
+                    selectedCatKey = 'GREEN';
+                } else if (activeOptionalColors.includes('LIGHTGREEN') && lightGreenKeywords.some(kw => textLower.includes(kw))) {
+                    selectedCatKey = 'LIGHTGREEN';
+                } else if (activeOptionalColors.includes('BLACK') && blackKeywords.some(kw => textLower.includes(kw))) {
+                    selectedCatKey = 'BLACK';
+                } else if (grayKeywords.some(kw => textLower.includes(kw)) && (colorCounts['GRAY'] || 0) < maxGrayCap) {
+                    selectedCatKey = 'GRAY';
+                }
+
+                if (!selectedCatKey) {
+                    let minCount = Infinity;
+                    let candidateKeys = [];
+
+                    activeBRollPool.forEach(k => {
+                        if (k === 'YELLOW' && (colorCounts['YELLOW'] || 0) >= maxYellowCap) return;
+                        if (k === 'GRAY' && (colorCounts['GRAY'] || 0) >= maxGrayCap) return;
+
+                        if (lastAssignedCategoryKey && activeBRollPool.length > 1 && k === lastAssignedCategoryKey) {
+                            return;
+                        }
+
+                        const cnt = colorCounts[k] || 0;
+                        if (cnt < minCount) {
+                            minCount = cnt;
+                            candidateKeys = [k];
+                        } else if (cnt === minCount) {
+                            candidateKeys.push(k);
+                        }
+                    });
+
+                    if (candidateKeys.length === 0) {
+                        candidateKeys = activeBRollPool.filter(k => {
+                            if (k === 'YELLOW' && (colorCounts['YELLOW'] || 0) >= maxYellowCap) return false;
+                            if (k === 'GRAY' && (colorCounts['GRAY'] || 0) >= maxGrayCap) return false;
+                            return k !== lastAssignedCategoryKey;
+                        });
+                        if (candidateKeys.length === 0) {
+                            candidateKeys = activeBRollPool.filter(k => {
+                                if (k === 'YELLOW' && (colorCounts['YELLOW'] || 0) >= maxYellowCap) return false;
+                                if (k === 'GRAY' && (colorCounts['GRAY'] || 0) >= maxGrayCap) return false;
+                                return true;
+                            });
+                        }
+                        if (candidateKeys.length === 0) candidateKeys = ['ORANGE'];
+                    }
+
+                    selectedCatKey = candidateKeys.length > 0 ? candidateKeys[idx % candidateKeys.length] : 'ORANGE';
+                }
+
+                colorCounts[selectedCatKey] = (colorCounts[selectedCatKey] || 0) + 1;
+                lastAssignedCategoryKey = selectedCatKey;
+                const catObj = CATEGORIES[selectedCatKey] || CATEGORIES.ORANGE;
+
+                return { ...item, category: catObj, visualPrompt: generateVisualConcept(catObj.id, item.text), revisionNote: '', isRevised: false };
+            });
+
+            for (let i = 0; i < parsedSentences.length - 1; i++) {
+                const currentText = parsedSentences[i].text.toLowerCase().trim();
+                const isTransition = transitionStarters.some(tr => currentText === tr || currentText === tr + ',');
+                
+                if (isTransition && parsedSentences[i + 1]) {
+                    parsedSentences[i].category = parsedSentences[i + 1].category;
+                    parsedSentences[i].visualPrompt = parsedSentences[i + 1].visualPrompt;
+                }
+            }
+
+            pushHistoryState("Proses Script");
+            renderAllViews();
+            showToast(`Script beres di-highlight per koma & titik! (Kuning: ${colorCounts['YELLOW'] || 0}, GFX: ${colorCounts['GRAY'] || 0}) 🔥`, "fa-wand-magic-sparkles", "text-emerald-400");
+        }
+
+        function renderAllViews() {
+            renderHighlightedOutput();
+            renderAssetSummary();
+            updateHeaderMetrics();
+        }
+
+        function updateHeaderMetrics() {
+            const total = parsedSentences.length;
+            if (total === 0) {
+                document.getElementById('metricBRoll').textContent = '0% (0)';
+                document.getElementById('metricARoll').textContent = '0% (0)';
+                document.getElementById('metricDuration').textContent = '0s';
+                
+                const mMobileB = document.getElementById('metricBRollMobile');
+                const mMobileDur = document.getElementById('metricDurationMobile');
+                if (mMobileB) mMobileB.textContent = '0%';
+                if (mMobileDur) mMobileDur.textContent = '0s';
+                return;
+            }
+
+            const aRollCount = parsedSentences.filter(s => s.category.id === 'A_ROLL').length;
+            const bRollCount = total - aRollCount;
+            const bRollPct = Math.round((bRollCount / total) * 100);
+            const aRollPct = 100 - bRollPct;
+
+            const totalWords = parsedSentences.reduce((acc, s) => acc + s.text.trim().split(/\s+/).filter(Boolean).length, 0);
+            const estSecs = Math.round((totalWords / 130) * 60);
+
+            document.getElementById('metricBRoll').textContent = `${bRollPct}% (${bRollCount})`;
+            document.getElementById('metricARoll').textContent = `${aRollPct}% (${aRollCount})`;
+            document.getElementById('metricDuration').textContent = `${estSecs}s (~${Math.round(estSecs/60)}m)`;
+
+            const mMobileB = document.getElementById('metricBRollMobile');
+            const mMobileDur = document.getElementById('metricDurationMobile');
+            if (mMobileB) mMobileB.textContent = `${bRollPct}%`;
+            if (mMobileDur) mMobileDur.textContent = `${estSecs}s`;
+        }
+
+        function renderHighlightedOutput() {
+            const container = document.getElementById('highlightedScriptOutput');
+            if (!container) return;
+
+            if (parsedSentences.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-14 text-slate-500 flex flex-col items-center gap-3">
+                        <i class="fa-solid fa-wand-magic-sparkles text-4xl text-[#1A73E8]/40 animate-pulse"></i>
+                        <p class="text-xs font-medium">Belum ada script nih! Paste naskah lu di panel kiri terus klik <strong>"Gaskeun Highlight & Breakdown!"</strong> ✨</p>
+                    </div>`;
+                return;
+            }
+
+            const showInline = document.getElementById('showInlineVisuals')?.checked || false;
+
+            if (articleFormat === 'prose') {
+                let html = '<div class="bg-white dark:bg-[#1C1D20] border border-slate-200 dark:border-[#2C2D32] rounded-xl p-4 sm:p-7 shadow-sm max-w-4xl mx-auto font-sans text-xs sm:text-sm leading-relaxed text-left text-slate-800 dark:text-slate-100 space-y-3.5">';
+                let currentParagraph = -1;
+
+                parsedSentences.forEach((s, idx) => {
+                    if (s.paragraphIndex !== currentParagraph) {
+                        if (currentParagraph !== -1) html += '</p>';
+                        currentParagraph = s.paragraphIndex;
+                        html += '<p class="mb-3 leading-loose text-left">';
+                    }
+
+                    const cat = s.category;
+                    if (cat.id === 'A_ROLL') {
+                        html += `<span onclick="openInlineColorPicker(event, ${idx})" class="hl-aroll opacity-90 cursor-pointer hover:underline" title="Klik untuk ganti warna A-Roll">${escapeHtml(s.text)} </span>`;
+                    } else {
+                        html += `<span onclick="openInlineColorPicker(event, ${idx})" class="${cat.colorClass} font-medium relative group cursor-pointer inline rounded px-1 py-0.5 hover:ring-2 hover:ring-blue-400 transition" title="Klik langsung untuk ubah warna | ${cat.name}: ${escapeHtml(s.visualPrompt)}">${escapeHtml(s.text)}${s.isRevised ? '<sup class="text-[9px] text-amber-500 font-bold ml-0.5">[Revisi]</sup>' : ''}</span> `;
+                    }
+
+                    if (showInline && cat.id !== 'A_ROLL') {
+                        html += `<span class="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 my-1 rounded bg-slate-100 dark:bg-[#121212] text-[#1A73E8] dark:text-blue-400 border border-blue-500/30"><i class="fa-solid fa-video text-[9px]"></i> ${escapeHtml(s.visualPrompt)}</span> `;
+                    }
+                });
+
+                if (currentParagraph !== -1) html += '</p>';
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                let html = '<div class="space-y-2.5 font-sans">';
+                parsedSentences.forEach((s, idx) => {
+                    const cat = s.category;
+                    html += `
+                        <div class="p-3 rounded-xl border border-slate-200 dark:border-[#2C2D32] ${cat.blockClass} transition hover:border-blue-500/50">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-1 font-mono text-xs">
+                                <span class="font-bold flex items-center gap-2">
+                                    <button onclick="openInlineColorPicker(event, ${idx})" class="px-2 py-0.5 rounded text-[10px] ${cat.badgeBg} hover:ring-1 hover:ring-blue-400 flex items-center gap-1" title="Klik untuk ganti warna">
+                                        <span>Shot #${s.id} • ${cat.code}</span>
+                                        <i class="fa-solid fa-paintbrush text-[8px]"></i>
+                                    </button>
+                                    ${s.isRevised ? '<span class="text-[9px] bg-amber-500/20 text-amber-500 border border-amber-500/30 px-1.5 py-0.2 rounded font-semibold">[DIREVISI]</span>' : ''}
+                                </span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-sans italic">Visual: ${escapeHtml(s.visualPrompt)}</span>
+                            </div>
+                            <p onclick="openInlineColorPicker(event, ${idx})" class="text-xs font-medium leading-relaxed dark:text-slate-200 text-slate-800 cursor-pointer hover:text-[#1A73E8] transition">${escapeHtml(s.text)}</p>
+                            ${s.revisionNote ? `<div class="mt-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-mono bg-amber-500/10 p-1 rounded border border-amber-500/20"><i class="fa-solid fa-note-sticky"></i> Catatan Editor: ${escapeHtml(s.revisionNote)}</div>` : ''}
+                        </div>`;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+        }
+
+        function renderAssetSummary() {
+            const container = document.getElementById('assetSummaryOutput');
+            if (!container) return;
+
+            if (parsedSentences.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-500 text-xs col-span-2">Belum ada rangkuman aset. Klik "Gaskeun Highlight & Breakdown!" dulu ya. 💡</div>`;
+                return;
+            }
+
+            const categoryCounts = {};
+            Object.keys(CATEGORIES).forEach(k => categoryCounts[k] = 0);
+            parsedSentences.forEach(s => categoryCounts[s.category.id] = (categoryCounts[s.category.id] || 0) + 1);
+
+            let cardsHtml = '';
+            Object.keys(CATEGORIES).forEach(key => {
+                const cat = CATEGORIES[key];
+                const count = categoryCounts[key] || 0;
+                if (count === 0 && key !== 'A_ROLL' && key !== 'ORANGE' && key !== 'GRAY' && key !== 'YELLOW') return;
+
+                const isEditable = (key === 'YELLOW' || key === 'GRAY');
+
+                cardsHtml += `
+                    <div class="p-3.5 rounded-xl border border-slate-200 dark:border-[#2C2D32] bg-slate-50 dark:bg-[#121212] flex flex-col justify-between gap-2.5 shadow-sm hover:border-[#1A73E8]/50 transition">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2 py-0.5 rounded text-xs font-bold ${cat.badgeBg}">${cat.code}</span>
+                                    <h4 class="font-bold text-xs dark:text-white text-slate-900">${cat.name}</h4>
+                                </div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    ${isEditable ? 'Atur jumlah maksimal klip untuk kategori ini:' : 'Total klip dibutuhkan untuk segmen ini'}
+                                </p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-2xl font-extrabold font-mono text-[#1A73E8] dark:text-blue-400">${count}</span>
+                                <span class="text-[10px] text-slate-400 block font-medium">Klip Active</span>
+                            </div>
+                        </div>
+
+                        ${isEditable ? `
+                            <div class="pt-2 border-t border-slate-200 dark:border-[#2C2D32] flex items-center justify-between gap-2 bg-white dark:bg-[#1C1D20] p-1.5 rounded-lg border border-slate-200 dark:border-[#2C2D32]">
+                                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                    <i class="fa-solid fa-sliders text-[#1A73E8]"></i> Limit Klip:
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="setCategoryLimit('${key}', -1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs transition flex items-center justify-center border border-slate-200 dark:border-slate-700" title="Kurangi 1 Klip">-</button>
+                                    <input type="number" min="0" max="50" value="${count}" onchange="setCategoryLimit('${key}', parseInt(this.value) || 0)" class="w-10 text-center bg-slate-50 dark:bg-[#121212] border border-slate-200 dark:border-[#2C2D32] rounded py-0.5 text-xs font-bold font-mono text-[#1A73E8] dark:text-blue-400 focus:outline-none">
+                                    <button onclick="setCategoryLimit('${key}', 1)" class="w-6 h-6 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs transition flex items-center justify-center border border-slate-200 dark:border-slate-700" title="Tambah 1 Klip">+</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>`;
+            });
+
+            container.innerHTML = cardsHtml;
+        }
+
+        function updateSentenceCategory(idx, catId) {
+            if (parsedSentences[idx] && CATEGORIES[catId]) {
+                parsedSentences[idx].category = CATEGORIES[catId];
+                parsedSentences[idx].visualPrompt = generateVisualConcept(catId, parsedSentences[idx].text);
+                renderAllViews();
+            }
+        }
+
+        function toggleArticleFormat(fmt) {
+            articleFormat = fmt;
+            const activeBtn = "px-2 py-0.5 rounded bg-[#1A73E8] text-white font-bold transition";
+            const inactiveBtn = "px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition";
+
+            const btnProse = document.getElementById('viewProseBtn');
+            const btnBlocks = document.getElementById('viewBlocksBtn');
+
+            if (btnProse) btnProse.className = fmt === 'prose' ? activeBtn : inactiveBtn;
+            if (btnBlocks) btnBlocks.className = fmt === 'blocks' ? activeBtn : inactiveBtn;
+            renderHighlightedOutput();
+        }
+
+        function applyPreset(presetKey) {
+            OPTIONAL_COLOR_KEYS.forEach(k => {
+                const el = document.getElementById(`chk_color_${k}`);
+                if (el) el.checked = false;
+            });
+
+            const activeMap = {
+                'problem_stakes': ['RED', 'PINK'],
+                'curiosity_gap': ['CYAN', 'BLUE'],
+                'shock_numbers': ['RED', 'CYAN'],
+                'human_story': ['LIGHTGREEN', 'BLUE'],
+                'micro_reveal': ['RED', 'CYAN'],
+                'before_after': ['LIGHTGREEN', 'CYAN'],
+                'all': []
+            };
+
+            const colorsToEnable = activeMap[presetKey] || [];
+            colorsToEnable.slice(0, 2).forEach(k => {
+                const el = document.getElementById(`chk_color_${k}`);
+                if (el) el.checked = true;
+            });
+
+            processArticle();
+            showToast(`Preset "${presetKey}" berhasil diterapkan! (Max 2 warna opsional)`, "fa-bolt", "text-amber-400");
+        }
+
+        function loadSampleArticle() {
+            const sampleText = `Presiden Joko Widodo menegaskan komitmen pemerintah dalam mempercepat pembangunan infrastruktur nasional untuk mendongkrak pertumbuhan ekonomi daerah. Dilansir dari berbagai sumber berita resmi, proyek strategis nasional ini diperkirakan membutuhkan investasi lebih dari Rp 500 triliun hingga akhir tahun depan.
+
+Menurut menteri terkait, alokasi anggaran tersebut akan difokuskan pada perluasan jalan tol, pelabuhan logistik, dan konektivitas digital di wilayah timur Indonesia. Pembicara utama menyatakan bahwa langkah ini merupakan impian besar bangsa untuk menciptakan keadilan sosial bagi seluruh rakyat Indonesia.
+
+"Kita tidak boleh membiarkan ketimpangan ekonomi terus berlanjut. Ini adalah momentum bagi kita untuk bangkit dan bersaing di kancah global," ujar tokoh nasional tersebut dalam pidato resminya kemarin.`;
+
+            const input = document.getElementById('articleInput');
+            const titleInput = document.getElementById('articleTitleInput');
+
+            if (titleInput) titleInput.value = "Infrastruktur Masa Depan Indonesia";
+            if (input) {
+                input.value = sampleText;
+                processArticle();
+            }
+        }
+
+        function openHistoryModal() {
+            renderHistoryList();
+            document.getElementById('historyModal')?.classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal')?.classList.add('hidden');
+        }
+
+        function renderHistoryList() {
+            const container = document.getElementById('historyListContainer');
+            const countText = document.getElementById('historyCountText');
+            if (!container) return;
+
+            if (historyLogs.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">Belum ada riwayat edit tersimpan dalam sesi ini.</div>`;
+                if (countText) countText.textContent = "0 Versi Tersimpan";
+                return;
+            }
+
+            if (countText) countText.textContent = `${historyLogs.length} Versi Tersimpan`;
+
+            let html = '';
+            historyLogs.forEach((item, index) => {
+                const bRollCount = item.parsedSentences.filter(s => s.category.id !== 'A_ROLL').length;
+                const aRollCount = item.parsedSentences.length - bRollCount;
+
+                html += `
+                    <div class="p-2.5 rounded-xl border border-slate-200 dark:border-[#2C2D32] bg-slate-50 dark:bg-[#121212]/70 hover:border-blue-500/50 transition flex items-center justify-between gap-2.5">
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded bg-blue-500/10 text-[#1A73E8] dark:text-blue-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">#${historyLogs.length - index}</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-xs font-bold dark:text-slate-200 text-slate-800">${escapeHtml(item.actionTitle)}</h4>
+                                    <span class="text-[10px] font-mono bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1 py-0.2 rounded">${item.timestamp}</span>
+                                </div>
+                                <div class="mt-0.5 flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                                    <span>Total: <strong>${item.shotCount} shot</strong></span>
+                                    <span>B-Roll: <strong class="text-amber-500">${bRollCount}</strong></span>
+                                    <span>A-Roll: <strong>${aRollCount}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="restoreHistoryState(${index})" class="px-2 py-1 text-xs font-semibold bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-lg shadow transition flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i> Pulihkan
+                        </button>
+                    </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function restoreHistoryState(index) {
+            const target = historyLogs[index];
+            if (!target) return;
+
+            const input = document.getElementById('articleInput');
+            if (input) input.value = target.rawText || '';
+
+            parsedSentences = JSON.parse(JSON.stringify(target.parsedSentences));
+            renderAllViews();
+            closeHistoryModal();
+            showToast(`Versi "${target.actionTitle}" (${target.timestamp}) dipulihkan!`, "fa-rotate-left", "text-emerald-400");
+        }
+
+        function clearHistoryLogs() {
+            historyLogs = [];
+            renderHistoryList();
+            showToast("Log history edit beres dibersihin total!", "fa-trash-can", "text-red-400");
+        }
+
+        function openTeleprompter() {
+            const modal = document.getElementById('teleprompterModal');
+            const container = document.getElementById('teleprompterTextContainer');
+            if (!modal || !container || parsedSentences.length === 0) return;
+
+            let html = '';
+            parsedSentences.forEach(s => {
+                html += `<p class="mb-4"><span class="${s.category.colorClass} font-semibold">${escapeHtml(s.text)}</span></p>`;
+            });
+
+            container.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+
+        function closeTeleprompter() {
+            document.getElementById('teleprompterModal')?.classList.add('hidden');
+            if (teleprompterInterval) {
+                clearInterval(teleprompterInterval);
+                teleprompterInterval = null;
+            }
+        }
+
+        function toggleTeleprompterPlay() {
+            const btn = document.getElementById('telePlayBtn');
+            const container = document.getElementById('teleprompterTextContainer');
+            const speedInput = document.getElementById('teleprompterSpeed');
+
+            if (teleprompterInterval) {
+                clearInterval(teleprompterInterval);
+                teleprompterInterval = null;
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-play"></i> Mulai ▶️';
+            } else {
+                const speed = parseInt(speedInput?.value || 3);
+                teleprompterInterval = setInterval(() => {
+                    if (container) container.scrollTop += speed;
+                }, 50);
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause ⏸️';
+            }
+        }
+
+        function copyFormattedScript() {
+            if (parsedSentences.length === 0) return;
+            let textOutput = "PRO VIDEO STORYBOARD & B-ROLL SCRIPT\n===================================\n\n";
+            parsedSentences.forEach(s => {
+                textOutput += `Shot #${s.id} [${s.category.code}]\nNaskah: ${s.text}\nVisual: ${s.visualPrompt}\n\n`;
+            });
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textOutput).then(() => {
+                    showToast("Naskah storyboard disalin ke clipboard! 📋", "fa-copy", "text-emerald-400");
+                }).catch(() => fallbackCopy(textOutput));
+            } else {
+                fallbackCopy(textOutput);
+            }
+        }
+
+        function fallbackCopy(textOutput) {
+            const textArea = document.createElement("textarea");
+            textArea.value = textOutput;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast("Naskah storyboard disalin! 📋", "fa-copy", "text-emerald-400");
+        }
+
+        function exportToPDF() {
+            const container = document.getElementById('storyboardExportContainer');
+            if (!container || parsedSentences.length === 0) return;
+            showToast("Menyiapkan dokumen PDF...", "fa-file-pdf", "text-emerald-400");
+            
+            container.classList.add('export-mode');
+            const isDark = document.documentElement.classList.contains('dark');
+            const bgHex = isDark ? '#1C1D20' : '#FFFFFF';
+
+            html2canvas(container, { 
+                scale: 2,
+                useCORS: true,
+                backgroundColor: bgHex,
+                logging: false,
+                windowWidth: container.scrollWidth
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('Storyboard_Video_Studio.pdf');
+                showToast("Download PDF berhasil! 📄", "fa-circle-check", "text-emerald-400");
+            }).catch(err => {
+                console.error("PDF Export Error:", err);
+                showToast("Gagal mengekspor PDF!", "fa-triangle-exclamation", "text-red-400");
+            }).finally(() => {
+                container.classList.remove('export-mode');
+            });
+        }
+
+        function exportToImage(format = 'jpg') {
+            const container = document.getElementById('storyboardExportContainer');
+            if (!container || parsedSentences.length === 0) return;
+            showToast("Mengekspor gambar JPG...", "fa-file-image", "text-sky-400");
+            
+            container.classList.add('export-mode');
+            const isDark = document.documentElement.classList.contains('dark');
+            const bgHex = isDark ? '#1C1D20' : '#FFFFFF';
+
+            html2canvas(container, { 
+                scale: 2,
+                useCORS: true,
+                backgroundColor: bgHex,
+                logging: false,
+                windowWidth: container.scrollWidth
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Storyboard_Video_Output.${format}`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+                showToast("Download JPG berhasil! 🖼️", "fa-circle-check", "text-emerald-400");
+            }).catch(err => {
+                console.error("JPG Export Error:", err);
+                showToast("Gagal mengekspor gambar!", "fa-triangle-exclamation", "text-red-400");
+            }).finally(() => {
+                container.classList.remove('export-mode');
+            });
+        }
+
+        function exportLocalProject() {
+            const rawText = document.getElementById('articleInput')?.value || '';
+            const titleVal = document.getElementById('articleTitleInput')?.value || '';
+            if (!rawText.trim() && parsedSentences.length === 0) {
+                showToast("Belum ada data script buat di-export nih!", "fa-triangle-exclamation", "text-amber-400");
+                return;
+            }
+
+            const projectData = {
+                appName: "Studio Storyboard & B-Roll",
+                version: "1.0",
+                exportedAt: new Date().toISOString(),
+                title: titleVal,
+                rawText: rawText,
+                parsedSentences: parsedSentences,
+                optionalColors: OPTIONAL_COLOR_KEYS.reduce((acc, k) => {
+                    acc[k] = document.getElementById(`chk_color_${k}`)?.checked || false;
+                    return acc;
+                }, {})
+            };
+
+            const jsonStr = JSON.stringify(projectData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Storyboard_Draft_${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            showToast("Draft proyek (.json) beres di-download! 💾", "fa-download", "text-emerald-400");
+        }
+
+        function triggerLocalImport() {
+            document.getElementById('localFileInput')?.click();
+        }
+
+        function importLocalProject(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.title !== undefined) {
+                        const titleInput = document.getElementById('articleTitleInput');
+                        if (titleInput) titleInput.value = data.title;
+                    }
+                    if (data.rawText !== undefined) {
+                        const input = document.getElementById('articleInput');
+                        if (input) input.value = data.rawText;
+                    }
+
+                    if (data.optionalColors) {
+                        Object.keys(data.optionalColors).forEach(k => {
+                            const el = document.getElementById(`chk_color_${k}`);
+                            if (el) el.checked = !!data.optionalColors[k];
+                        });
+                    }
+
+                    if (data.parsedSentences && Array.isArray(data.parsedSentences) && data.parsedSentences.length > 0) {
+                        parsedSentences = data.parsedSentences;
+                    } else if (data.rawText) {
+                        processArticle();
+                        return;
+                    }
+
+                    pushHistoryState("Impor File Proyek JSON");
+                    updateDisplayTitle();
+                    renderAllViews();
+                    updateWordCount();
+                    showToast("Draft proyek lokal sukses dimuat! 📂", "fa-file-import", "text-emerald-400");
+                } catch (err) {
+                    console.error("Gagal membaca file JSON proyek:", err);
+                    showToast("Format file JSON tidak valid!", "fa-triangle-exclamation", "text-red-400");
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // --- GLOBAL EVENT LISTENERS ---
+        document.addEventListener('click', function(e) {
+            const popover = document.getElementById('inlineColorPickerPopover');
+            if (popover && !popover.classList.contains('hidden')) {
+                if (!popover.contains(e.target)) {
+                    closeInlineColorPicker();
+                }
+            }
+        });
+
+        // BIND FUNCTIONS TO WINDOW
+        window.handleCustomTextSelection = handleCustomTextSelection;
+        window.openCustomSelectionColorPicker = openCustomSelectionColorPicker;
+        window.applyCustomSelectionColor = applyCustomSelectionColor;
+        window.openInlineColorPicker = openInlineColorPicker;
+        window.applyInlineColorChoice = applyInlineColorChoice;
+        window.closeInlineColorPicker = closeInlineColorPicker;
+        window.setCategoryLimit = setCategoryLimit;
+        window.generateVisualConcept = generateVisualConcept;
+        window.updateWordCount = updateWordCount;
+        window.processArticle = processArticle;
+        window.renderAllViews = renderAllViews;
+        window.updateHeaderMetrics = updateHeaderMetrics;
+        window.renderHighlightedOutput = renderHighlightedOutput;
+        window.renderAssetSummary = renderAssetSummary;
+        window.updateSentenceCategory = updateSentenceCategory;
+        window.toggleArticleFormat = toggleArticleFormat;
+        window.applyPreset = applyPreset;
+        window.loadSampleArticle = loadSampleArticle;
+        window.openHistoryModal = openHistoryModal;
+        window.closeHistoryModal = closeHistoryModal;
+        window.renderHistoryList = renderHistoryList;
+        window.restoreHistoryState = restoreHistoryState;
+        window.clearHistoryLogs = clearHistoryLogs;
+        window.openTeleprompter = openTeleprompter;
+        window.closeTeleprompter = closeTeleprompter;
+        window.toggleTeleprompterPlay = toggleTeleprompterPlay;
+        window.copyFormattedScript = copyFormattedScript;
+        window.exportToPDF = exportToPDF;
+        window.exportToImage = exportToImage;
+        window.exportLocalProject = exportLocalProject;
+        window.triggerLocalImport = triggerLocalImport;
+        window.importLocalProject = importLocalProject;
+
+        window.onload = function() {
+            try {
+                const savedTheme = localStorage.getItem('studio_theme_mode') || 'dark';
+                setThemeMode(savedTheme);
+            } catch(e) {
+                setThemeMode('dark');
+            }
+            updateWordCount();
+            updateDisplayTitle();
+        };
+    </script>
+</body>
+</html>
