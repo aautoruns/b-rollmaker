@@ -336,9 +336,26 @@
 
             <!-- Script Input Card -->
             <div class="bg-white dark:bg-[#1F2125] border border-slate-300 dark:border-[#2E3137] rounded-2xl p-4 shadow-md flex-1 flex flex-col space-y-2.5">
-                <div>
-                    <label for="articleTitleInput" class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Judul Naskah 📝:</label>
-                    <input type="text" id="articleTitleInput" oninput="updateDisplayTitle()" placeholder="Ketik judul naskah lu..." class="w-full bg-slate-100 dark:bg-[#16171A] border border-slate-300 dark:border-[#2E3137] text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-blue-500 transition">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div class="sm:col-span-7">
+                        <label for="articleTitleInput" class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Judul Naskah 📝:</label>
+                        <input type="text" id="articleTitleInput" oninput="updateDisplayTitle()" placeholder="Ketik judul naskah lu..." class="w-full bg-slate-100 dark:bg-[#16171A] border border-slate-300 dark:border-[#2E3137] text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-blue-500 transition">
+                    </div>
+                    <div class="sm:col-span-5">
+                        <label for="writerSelect" class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">Penulis Artikel 👤:</label>
+                        <div class="flex items-center gap-1">
+                            <select id="writerSelect" onchange="updateDisplayTitle()" class="w-full bg-slate-100 dark:bg-[#16171A] border border-slate-300 dark:border-[#2E3137] text-slate-900 dark:text-slate-100 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-blue-500 transition cursor-pointer">
+                                <option value="">- Pilih Writer -</option>
+                                <option value="MA">MA</option>
+                                <option value="MLL">MLL</option>
+                                <option value="ST">ST</option>
+                                <option value="ZR">ZR</option>
+                            </select>
+                            <button onclick="copyWriterTag()" class="px-2.5 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-[#2E3137] rounded-xl text-xs font-bold transition shrink-0" title="Copas Inisial Penulis">
+                                <i class="fa-solid fa-copy text-blue-500"></i> Copas
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between">
@@ -553,10 +570,30 @@
 
         window.updateDisplayTitle = function() {
             const val = document.getElementById('articleTitleInput')?.value || '';
+            const writer = document.getElementById('writerSelect')?.value || '';
             const display = document.getElementById('displayArticleTitle');
             if (display) {
-                display.textContent = val.trim() ? val.trim() : '[ Belum Ada Judul Naskah ]';
+                let fullTitle = val.trim() ? val.trim() : '[ Belum Ada Judul Naskah ]';
+                if (writer) {
+                    fullTitle += ` • (Writer: ${writer})`;
+                }
+                display.textContent = fullTitle;
             }
+        };
+
+        window.copyWriterTag = function() {
+            const writer = document.getElementById('writerSelect')?.value || '';
+            if (!writer) {
+                window.showToast("Pilih penulis dulu di dropdown! 👤", "fa-triangle-exclamation", "text-amber-500");
+                return;
+            }
+            const textArea = document.createElement("textarea");
+            textArea.value = writer;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            window.showToast(`Penulis "${writer}" berhasil dicopas ke clipboard! 📋`, "fa-copy", "text-emerald-500");
         };
 
         // CATEGORIES DEFINITIONS
@@ -620,9 +657,10 @@
                 return el && el.checked;
             }).length;
 
-            if (checkedCount > 2) {
+            // Strict limit: Maximum 4 total colors active (Oranye + A-Roll + Yellow/Gray + Max 1 optional)
+            if (checkedCount > 1) {
                 changedEl.checked = false;
-                window.showToast("Maksimal hanya 2 warna opsional yang bisa dicentang! 🛑", "fa-triangle-exclamation", "text-amber-500");
+                window.showToast("Maksimal 4 warna total! (Oranye + A-Roll + Kuning/Abu + 1 warna opsional) 🛑", "fa-triangle-exclamation", "text-amber-500");
                 return;
             }
             processArticle();
@@ -677,10 +715,35 @@
 
             let maxGray = customLimits.GRAY !== undefined && customLimits.GRAY !== null ? customLimits.GRAY : 999;
 
-            const activeOptional = OPTIONAL_COLOR_KEYS.filter(k => {
+            // Get user selected optional colors
+            let activeOptional = OPTIONAL_COLOR_KEYS.filter(k => {
                 const el = document.getElementById(`chk_color_${k}`);
                 return el && el.checked;
             });
+
+            // STRICT 4-COLOR PALETTE FORMULA:
+            // Color 1: ORANGE (Mandatory / Wajib Ada)
+            // Color 2: A_ROLL (~40% ratio)
+            // Color 3: YELLOW or GRAY (Accent figures / data)
+            // Color 4: 1 Selected/Contextual Optional Color (Red, Cyan, Green, Blue, etc.)
+            let optionalColorKey = activeOptional.length > 0 ? activeOptional[0] : null;
+
+            if (!optionalColorKey) {
+                const fullLower = rawText.toLowerCase();
+                if (fullLower.includes('konflik') || fullLower.includes('masalah') || fullLower.includes('krisis') || fullLower.includes('bahaya') || fullLower.includes('dramatis')) {
+                    optionalColorKey = 'RED';
+                } else if (fullLower.includes('investigasi') || fullLower.includes('breaking') || fullLower.includes('terungkap') || fullLower.includes('eksklusif')) {
+                    optionalColorKey = 'CYAN';
+                } else if (fullLower.includes('ekonomi') || fullLower.includes('bisnis') || fullLower.includes('investasi') || fullLower.includes('uang') || fullLower.includes('triliun')) {
+                    optionalColorKey = 'GREEN';
+                } else if (fullLower.includes('visi') || fullLower.includes('masa depan') || fullLower.includes('impian') || fullLower.includes('bangsa')) {
+                    optionalColorKey = 'BLUE';
+                } else if (fullLower.includes('sejarah') || fullLower.includes('nostalgia') || fullLower.includes('dulu')) {
+                    optionalColorKey = 'LIGHTGREEN';
+                } else {
+                    optionalColorKey = 'RED'; // Dynamic 4th color
+                }
+            }
 
             const paragraphs = rawText.split(/\n+/).map(p => p.trim()).filter(Boolean);
             let rawClauseList = [];
@@ -747,12 +810,11 @@
             const yellowIndexSet = new Set(candidateYellowIndices);
 
             let grayCount = 0;
-            let lastCatKey = '';
 
             parsedSentences = rawClauseList.map((clause, idx) => {
                 const trimmedText = clause.text.trim();
                 
-                // PRESERVE PREVIOUS HIGHLIGHT IF CLAUSE MATCHES EXISTING TEXT
+                // PRESERVE PREVIOUS USER COLOR REVISIONS
                 if (existingColorMap.has(trimmedText)) {
                     const preserved = existingColorMap.get(trimmedText);
                     return {
@@ -769,51 +831,23 @@
                 let assignedCat = CATEGORIES.ORANGE;
                 const textLower = clause.text.toLowerCase();
 
-                const isTransition = /^(meski begitu|namun demikian|selain itu|di sisi lain|oleh karena itu|dengan kata lain|sebagai hasilnya|sebaliknya),/i.test(clause.text);
-
+                // A-Roll Slot (~40% ratio)
                 const isARollSlot = (idx % 5 === 1 || idx % 5 === 3);
 
                 if (yellowIndexSet.has(idx)) {
                     assignedCat = CATEGORIES.YELLOW;
                 } else if (isARollSlot) {
                     assignedCat = CATEGORIES.A_ROLL;
-                } else if (isTransition && idx < rawClauseList.length - 1) {
-                    const nextText = rawClauseList[idx + 1].text.toLowerCase();
-                    if ((nextText.includes('rp') || nextText.includes('persen') || /\d+/.test(nextText)) && grayCount < maxGray) {
-                        assignedCat = CATEGORIES.GRAY;
-                        grayCount++;
-                    } else if (activeOptional.includes('GREEN') && (nextText.includes('ekonomi') || nextText.includes('bisnis') || nextText.includes('saham'))) {
-                        assignedCat = CATEGORIES.GREEN;
-                    } else {
-                        assignedCat = CATEGORIES.ORANGE;
-                    }
                 } else if ((/\d+/.test(clause.text) || textLower.includes('rp') || textLower.includes('persen') || textLower.includes('dilansir') || textLower.includes('media')) && grayCount < maxGray) {
                     assignedCat = CATEGORIES.GRAY;
                     grayCount++;
-                } else if (activeOptional.includes('GREEN') && (textLower.includes('ekonomi') || textLower.includes('investasi') || textLower.includes('bisnis') || textLower.includes('uang'))) {
-                    assignedCat = CATEGORIES.GREEN;
-                } else if (activeOptional.includes('LIGHTGREEN') && (textLower.includes('sejarah') || textLower.includes('nostalgia') || textLower.includes('dulu') || textLower.includes('masa lalu'))) {
-                    assignedCat = CATEGORIES.LIGHTGREEN;
-                } else if (activeOptional.includes('BROWN') && (textLower.includes('formasi') || textLower.includes('taktik') || textLower.includes('pelatih') || textLower.includes('strategi'))) {
-                    assignedCat = CATEGORIES.BROWN;
-                } else if (activeOptional.includes('RED') && (textLower.includes('konflik') || textLower.includes('masalah') || textLower.includes('krisis') || textLower.includes('bahaya'))) {
-                    assignedCat = CATEGORIES.RED;
-                } else if (activeOptional.length > 0) {
-                    const pool = [CATEGORIES.ORANGE, CATEGORIES[activeOptional[idx % activeOptional.length]]];
-                    assignedCat = pool[idx % pool.length] || CATEGORIES.ORANGE;
+                } else if (optionalColorKey && CATEGORIES[optionalColorKey] && (idx % 2 === 0)) {
+                    // Distribute the 4th color alongside Orange
+                    assignedCat = CATEGORIES[optionalColorKey];
                 } else {
+                    // Default mandatory base color
                     assignedCat = CATEGORIES.ORANGE;
                 }
-
-                if (assignedCat.id === lastCatKey && assignedCat.id !== 'A_ROLL' && assignedCat.id !== 'YELLOW') {
-                    if (assignedCat.id === 'ORANGE' && grayCount < maxGray) {
-                        assignedCat = CATEGORIES.GRAY;
-                        grayCount++;
-                    } else {
-                        assignedCat = CATEGORIES.ORANGE;
-                    }
-                }
-                lastCatKey = assignedCat.id;
 
                 return {
                     id: idx + 1,
@@ -828,7 +862,20 @@
 
             pushHistoryState("Highlight Naskah Baru");
             renderAllViews();
-            window.showToast("Highlight & Breakdown Naskah Sukses! 🔥", "fa-wand-magic-sparkles", "text-blue-500");
+            window.showToast("Breakdown Sukses: Oranye Wajib + Maksimal 4 Warna! 🔥", "fa-wand-magic-sparkles", "text-blue-500");
+        }
+
+        function setCategoryLimit(catKey, val) {
+            const parsedVal = parseInt(val);
+            if (isNaN(parsedVal) || parsedVal < 0) return;
+            customLimits[catKey] = parsedVal;
+            processArticle();
+        }
+
+        function resetCustomLimits() {
+            customLimits = {};
+            processArticle();
+            window.showToast("Limit klip otomatis dipulihkan!", "fa-rotate-left", "text-emerald-500");
         }
 
         function generateVisualConcept(text, cat) {
@@ -1616,6 +1663,7 @@ Menurut menteri terkait, alokasi anggaran tersebut akan difokuskan pada perluasa
         window.applyInlineColorChoice = applyInlineColorChoice;
         window.deleteActiveShotText = deleteActiveShotText;
         window.closeInlineColorPicker = closeInlineColorPicker;
+        window.copyWriterTag = copyWriterTag;
         window.setCategoryLimit = setCategoryLimit;
         window.resetCustomLimits = resetCustomLimits;
         window.generateVisualConcept = generateVisualConcept;
